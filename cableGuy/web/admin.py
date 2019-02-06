@@ -1,21 +1,21 @@
 from django.contrib import admin
 from advanced_filters.admin import AdminAdvancedFiltersMixin
 from .models import *
+from import_export.admin import ImportExportModelAdmin
 
 
+@admin.register(DeviceType)
+class DeviceTypeAdmin(ImportExportModelAdmin):
+    list_display = ('name', 'code','notes')
 
-class DeviceTypeAdmin(admin.ModelAdmin):
-     list_display = ('name', 'code','notes')
-
-admin.site.register(DeviceType,DeviceTypeAdmin)
 
 class CableAdmin(AdminAdvancedFiltersMixin,admin.ModelAdmin):
      list_display = ('__str__','system', 'from_room','to_room','from_device','to_device')
-
+     list_filter = ('from_room', 'from_device')
      # specify which fields can be selected in the advanced filter
      # creation form
      advanced_filter_fields = ('from_room','to_room','from_device','to_device')
-     
+
      def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if (db_field.name == "from_device") or (db_field.name == "to_device"):
             kwargs["queryset"] = Device.objects.order_by('room')
@@ -25,7 +25,7 @@ class CableAdmin(AdminAdvancedFiltersMixin,admin.ModelAdmin):
 
 admin.site.register(Cable,CableAdmin)
 
-admin.site.register(System)
+#admin.site.register(System)
 
 class RoomInline(admin.StackedInline):
     model = Room
@@ -51,14 +51,19 @@ class RoomAdmin(admin.ModelAdmin):
 
 admin.site.register(Room,RoomAdmin)
 
-class DeviceAdmin(admin.ModelAdmin):
+@admin.register(Device)
+class DeviceAdmin(ImportExportModelAdmin):
      list_display = ('code','room')
      inlines = [SubDeviceInline]
 
-admin.site.register(Device,DeviceAdmin)
 
 class BuildingAdmin(admin.ModelAdmin):
      list_display = ('name', 'code','notes')
      inlines = [RoomInline]
 
 admin.site.register(Building,BuildingAdmin)
+
+
+@admin.register(System)
+class ItemImportExportAdmin(ImportExportModelAdmin):
+    pass

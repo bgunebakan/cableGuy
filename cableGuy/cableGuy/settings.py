@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'advanced_filters',
+    'import_export',
     'web',
 
 ]
