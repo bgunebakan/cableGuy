@@ -33,7 +33,7 @@ class Building(models.Model):
         verbose_name_plural = _(u'Buildings')
 
     def __str__(self):
-        return self.building.name + ' -- ' + str(self.name)
+        return self.name
 
 class Room(models.Model):
 
@@ -55,7 +55,7 @@ class Room(models.Model):
         verbose_name_plural = _(u'Rooms')
 
     def __str__(self):
-        return self.building.name + ' -- ' + str(self.name)
+        return str(self.name)
 
 class System(models.Model):
 
@@ -101,8 +101,8 @@ class DeviceType(models.Model):
 
 class Device(models.Model):
 
-    name = models.CharField(max_length=30,unique=True,verbose_name = "Name")
-    code = models.CharField(max_length=30,unique=True,verbose_name = "Code")
+    #name = models.CharField(max_length=30,blank=True,null=True,verbose_name = "Name")
+    code = models.CharField(max_length=30,null=True,blank=True,verbose_name = "Code",help_text="Leave empty for auto code generation")
     room = models.ForeignKey(Room,null=False,blank=False,on_delete=models.CASCADE,verbose_name = "Room")
     device_type = models.ForeignKey(DeviceType,null=True,blank=True,on_delete=models.CASCADE,verbose_name = "Device Type")
 
@@ -117,19 +117,19 @@ class Device(models.Model):
     objects = SoftDeleteManager()
 
     class Meta:
-        ordering = ['name']
+        ordering = ['code']
         verbose_name = _(u'Device')
         verbose_name_plural = _(u'Devices')
 
     def __str__(self):
-        return self.name
+        return str(self.room) + " " + str(self.code)
 
 class Cable(models.Model):
 
     system = models.ForeignKey(System,null=False,blank=False,on_delete=models.CASCADE,verbose_name = "System")
 
     from_room = models.ForeignKey(Room,related_name="from_room",null=False,blank=False,on_delete=models.CASCADE,verbose_name = "From Room")
-    to_room = models.ForeignKey(Room,related_name="to_room",null=False,blank=False,on_delete=models.CASCADE,verbose_name = "From Room")
+    to_room = models.ForeignKey(Room,related_name="to_room",null=False,blank=False,on_delete=models.CASCADE,verbose_name = "To Room")
 
     from_device = models.ForeignKey(Device,related_name="from_device",null=False,blank=False,on_delete=models.CASCADE,verbose_name = "From Device")
     to_device = models.ForeignKey(Device,related_name="to_device",null=False,blank=False,on_delete=models.CASCADE,verbose_name = "To Device")
@@ -150,4 +150,7 @@ class Cable(models.Model):
         verbose_name_plural = _(u'Cables')
 
     def __str__(self):
-        return str(self.system) + ":" + str(self.from_room) + ":" + str(self.from_device) + "/" + str(self.to_room) + ":" + str(self.to_device)
+        if self.from_room != self.to_room:
+            return str(self.system.code) + ":" + str(self.from_room.code) + ":" + str(self.from_device.code) + "/" + str(self.to_room.code) + ":" + str(self.to_device.code)
+        else:
+            return str(self.system.code) + ":" + str(self.from_room.code) + ":" + str(self.from_device.code) + "/" + str(self.to_device.code)
