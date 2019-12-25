@@ -54,7 +54,7 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-cableGuy.sqlite3
+#cableGuy.sqlite3
 !**/migrations/__init__.py
 **/migrations/*
 
