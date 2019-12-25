@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'advanced_filters',
     'import_export',
     'web',
+    'admirarchy'
 
 ]
 
